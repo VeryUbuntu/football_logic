@@ -1,0 +1,57 @@
+{
+    "system_manifesto": {
+        "title": "ABRA\nSIVE\nLOGIC",
+        "subtitle": "WE REJECT THE SOFT CURVES\nOF CORPORATE COMFORT. THE\nFUTURE IS RAW, VISIBLE, AND\nUNCOMPROMISING."
+    },
+    "nav": {
+        "archives": "ARCHIVES",
+        "protocols": "PROTOCOLS",
+        "nodes": "NODES"
+    },
+    "header": {
+        "input_label": "OPERATIONAL_INPUT //",
+        "input_placeholder": "[ENTER_VIDEO_LOGIC_SOURCE...]",
+        "freeze_btn": "FREEZE // ANALYZE",
+        "resume_btn": "RESUME_FEED"
+    },
+    "monolith": {
+        "awaiting_signal": "[AWAITING_SIGNAL]"
+    },
+    "sidebar": {
+        "data_stream": "DATA_STREAM //",
+        "tactical_tools": "TACTICAL TOOLS",
+        "save_frame": "SAVE_FRAME",
+        "export_json": "EXPORT_JSON"
+    },
+    "logs": {
+        "system_ready": "SYSTEM_READY: WAITING_FOR_INPUT...",
+        "source_detected": "SOURCE_DETECTED: {{type}}_ID [{{id}}]",
+        "stream_linked": "MONOLITH_CORE: STREAM_LINKED",
+        "invalid_source": "ERROR: INVALID_SOURCE_PROTOCOL",
+        "mode_switch_on": "MODE_SWITCH: TACTICAL_DECRYPTION [ON]",
+        "mode_switch_off": "MODE_SWITCH: PASSIVE_OBSERVATION [ON]",
+        "freehand_path": "TACTIC_MARK: FREEHAND_PATH_CREATED",
+        "canvas_wipe": "OPERATIONAL: CANVAS_WIPE_COMPLETE",
+        "entity_select": "ENTITY_SELECT: ID_{{team}}_{{number}}",
+        "tag_attached": "TAG_ATTACHED: \"{{tag}}\" -> ENTITY_{{id}}",
+        "logic_committed": "LOGIC_COMMITTED: NODE_ID [{{id}}]",
+        "timeline_jump": "TIMELINE_JUMP: RESTORED NODE_{{label}}",
+        "system_init": "SYSTEM_INIT: COMMAND_CENTER_ONLINE"
+    },
+    "command": {
+        "viewport_reality": "VIEWPORT_01 :: THE_REALITY",
+        "view_feed": "LIVE_FEED",
+        "viewport_logic": "VIEWPORT_02 :: THE_LOGIC",
+        "commit_logic": "[COMMIT_LOGIC]",
+        "nodes_saved": "NODES_SAVED",
+        "no_logic": "[NO_LOGIC_COMMITTED]",
+        "state_entities": "STATE: {{count}} ENTITIES",
+        "reset_pitch": "Reset Pitch"
+    },
+    "tags": {
+        "library_title": "TAG_LIBRARY // SELECT",
+        "strategic": "[STRATEGIC]",
+        "spatial": "[SPATIAL]",
+        "action": "[ACTION]"
+    }
+}

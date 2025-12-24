@@ -1,0 +1,57 @@
+{
+    "system_manifesto": {
+        "title": "ABRA\nSIVE\nLOGIC",
+        "subtitle": "我们要拒绝那些虚假的公司式舒适。\n未来是生猛的、可见的、\n毫不妥协的。"
+    },
+    "nav": {
+        "archives": "归档",
+        "protocols": "协议",
+        "nodes": "节点"
+    },
+    "header": {
+        "input_label": "操作输入 //",
+        "input_placeholder": "[输入_视频_逻辑_源...]",
+        "freeze_btn": "冻结 // 分析",
+        "resume_btn": "恢复信号"
+    },
+    "monolith": {
+        "awaiting_signal": "[等待信号]"
+    },
+    "sidebar": {
+        "data_stream": "数据流 //",
+        "tactical_tools": "战术工具",
+        "save_frame": "保存帧",
+        "export_json": "导出_JSON"
+    },
+    "logs": {
+        "system_ready": "系统就绪: 等待输入...",
+        "source_detected": "源检测: {{type}}_ID [{{id}}]",
+        "stream_linked": "巨石核心: 流已链接",
+        "invalid_source": "错误: 无效源协议",
+        "mode_switch_on": "模式切换: 战术解密 [开启]",
+        "mode_switch_off": "模式切换: 被动观测 [开启]",
+        "freehand_path": "战术标记: 创建手绘路径",
+        "canvas_wipe": "操作: 画布擦除完成",
+        "entity_select": "实体选择: ID_{{team}}_{{number}}",
+        "tag_attached": "标签附加: \"{{tag}}\" -> 实体_{{id}}",
+        "logic_committed": "逻辑提交: 节点_ID [{{id}}]",
+        "timeline_jump": "时间轴跳转: 恢复节点_{{label}}",
+        "system_init": "系统初始化: 指挥中心在线"
+    },
+    "command": {
+        "viewport_reality": "视口_01 :: 现实层",
+        "view_feed": "实时信号",
+        "viewport_logic": "视口_02 :: 逻辑层",
+        "commit_logic": "[提交逻辑]",
+        "nodes_saved": "已存节点",
+        "no_logic": "[暂无逻辑提交]",
+        "state_entities": "状态: {{count}} 实体",
+        "reset_pitch": "重置球场"
+    },
+    "tags": {
+        "library_title": "标签库 // 选择",
+        "strategic": "[战略]",
+        "spatial": "[空间]",
+        "action": "[动作]"
+    }
+}
