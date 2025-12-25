@@ -46,9 +46,17 @@ sudo docker build -t football-logic .
 ```
 
 ### 3. Run Container
+You MUST provide your **real** Supabase URL and Key at runtime for the app to function correctly.
+
 ```bash
-# Run on port 3000 (auto-restart enabled)
-sudo docker run -d -p 3000:3000 --restart always --name football-app football-logic
+# Run on port 3000 (Replace placeholders with your actual Supabase credentials)
+sudo docker run -d \
+  -p 3000:3000 \
+  --restart always \
+  --name football-app \
+  -e NEXT_PUBLIC_SUPABASE_URL="your_real_url_here" \
+  -e NEXT_PUBLIC_SUPABASE_ANON_KEY="your_real_key_here" \
+  football-logic
 ```
 
 Access your app at `http://<YOUR_SERVER_IP>:3000/command`.
