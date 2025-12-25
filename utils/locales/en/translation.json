@@ -42,6 +42,8 @@
         "viewport_reality": "VIEWPORT_01 :: THE_REALITY",
         "view_feed": "LIVE_FEED",
         "viewport_logic": "VIEWPORT_02 :: THE_LOGIC",
+        "red_team_name": "Red Team Name...",
+        "blue_team_name": "Blue Team Name...",
         "commit_logic": "[COMMIT_LOGIC]",
         "nodes_saved": "NODES_SAVED",
         "no_logic": "[NO_LOGIC_COMMITTED]",

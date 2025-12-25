@@ -42,6 +42,8 @@
         "viewport_reality": "视口_01 :: 现实层",
         "view_feed": "实时信号",
         "viewport_logic": "视口_02 :: 逻辑层",
+        "red_team_name": "红队名称...",
+        "blue_team_name": "蓝队名称...",
         "commit_logic": "[提交逻辑]",
         "nodes_saved": "已存节点",
         "no_logic": "[暂无逻辑提交]",

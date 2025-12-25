@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import type { Player } from "./Pitch2D"
+import type { Player, TacticalLine } from "./Pitch2D"
 import { cn } from "@/utils/cn"
 
 export type LogicNode = {
@@ -9,6 +9,7 @@ export type LogicNode = {
     timestamp: number // seconds in video
     label: string
     boardState: Player[]
+    lineState?: TacticalLine[]
 }
 
 interface DataLogStreamProps {
