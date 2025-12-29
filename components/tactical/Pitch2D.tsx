@@ -39,20 +39,38 @@ interface Pitch2DProps {
     players: Player[]
     lines: TacticalLine[]
     zones?: TacticalZone[] // Added
+    ballPosition?: { x: number, y: number } // New Ball Prop
     isDrawingMode: boolean
     isEraserMode: boolean
+    showOffsideLines?: boolean // New Toggle
     currentStyle: DrawingStyle
     onPlayerMove: (id: string, x: number, y: number) => void
+    onBallMove?: (x: number, y: number) => void // New Ball Handler
     onPlayerSelect: (leader: Player) => void
     onLineCreate: (line: TacticalLine) => void
     onLineRemove: (lineId: string) => void
     selectedPlayerId?: string | null
 }
 
-export function Pitch2D({ players, lines, zones = [], isDrawingMode, isEraserMode, currentStyle, onPlayerMove, onPlayerSelect, onLineCreate, onLineRemove, selectedPlayerId }: Pitch2DProps) {
+export function Pitch2D({
+    players,
+    lines,
+    zones = [],
+    ballPosition,
+    isDrawingMode,
+    isEraserMode,
+    showOffsideLines = true,
+    currentStyle,
+    onPlayerMove,
+    onBallMove,
+    onPlayerSelect,
+    onLineCreate,
+    onLineRemove,
+    selectedPlayerId
+}: Pitch2DProps) {
     const pitchRef = React.useRef<HTMLDivElement>(null)
 
-    // State for dragging/moving players
+    // State for dragging/moving players OR ball
     const [draggingId, setDraggingId] = React.useState<string | null>(null)
     const [dragStartPos, setDragStartPos] = React.useState<{ x: number, y: number } | null>(null)
 
@@ -123,8 +141,8 @@ export function Pitch2D({ players, lines, zones = [], isDrawingMode, isEraserMod
         setCurrentPoints([])
     }
 
-    // --- PLAYER EVENTS (Moving) ---
-    const handlePlayerPointerDown = (e: React.PointerEvent, player: Player) => {
+    // --- PLAYER & BALL EVENTS (Moving) ---
+    const handleEntityPointerDown = (e: React.PointerEvent, id: string) => {
         if (isDrawingMode) return
         e.stopPropagation()
         e.preventDefault()
@@ -132,27 +150,33 @@ export function Pitch2D({ players, lines, zones = [], isDrawingMode, isEraserMod
         const target = e.target as Element
         target.setPointerCapture(e.pointerId)
 
-        setDraggingId(player.id)
+        setDraggingId(id)
         setDragStartPos({ x: e.clientX, y: e.clientY })
     }
 
-    const handlePlayerPointerMove = (e: React.PointerEvent, player: Player) => {
-        if (isDrawingMode || draggingId !== player.id) return
+    const handleEntityPointerMove = (e: React.PointerEvent, id: string) => {
+        if (isDrawingMode || draggingId !== id) return
         e.preventDefault()
         e.stopPropagation()
 
         const coords = getRelativeCoords(e)
-        onPlayerMove(player.id, coords.x, coords.y)
+
+        if (id === 'ball' && onBallMove) {
+            onBallMove(coords.x, coords.y)
+        } else {
+            onPlayerMove(id, coords.x, coords.y)
+        }
     }
 
-    const handlePlayerPointerUp = (e: React.PointerEvent, player: Player) => {
+    const handleEntityPointerUp = (e: React.PointerEvent, player?: Player) => {
         if (isDrawingMode) return
         e.stopPropagation()
 
         const target = e.target as Element
         if (target.releasePointerCapture) target.releasePointerCapture(e.pointerId)
 
-        if (dragStartPos) {
+        // Select player logic (only for actual players, not ball)
+        if (dragStartPos && player) {
             const dist = Math.sqrt(Math.pow(e.clientX - dragStartPos.x, 2) + Math.pow(e.clientY - dragStartPos.y, 2))
             if (dist < 5) {
                 onPlayerSelect(player)
@@ -164,13 +188,19 @@ export function Pitch2D({ players, lines, zones = [], isDrawingMode, isEraserMod
 
     // Calculate Offside Lines
     // 1. Red Team Line (Defending Left x=0) -> Limits Blue Attackers
-    // Rule: 2nd to last defender (including GK)
+    // Rule: 2nd to last defender OR Ball (if closer to goal)
     const redPlayers = players.filter(p => p.team === 'red').sort((a, b) => a.x - b.x)
-    const redOffsideX = redPlayers.length >= 2 ? redPlayers[1].x : null
+    let redOffsideX = redPlayers.length >= 2 ? redPlayers[1].x : null
+    if (redOffsideX !== null && ballPosition) {
+        redOffsideX = Math.min(redOffsideX, ballPosition.x)
+    }
 
     // 2. Blue Team Line (Defending Right x=100) -> Limits Red Attackers
     const bluePlayers = players.filter(p => p.team === 'blue').sort((a, b) => b.x - a.x) // Descending
-    const blueOffsideX = bluePlayers.length >= 2 ? bluePlayers[1].x : null
+    let blueOffsideX = bluePlayers.length >= 2 ? bluePlayers[1].x : null
+    if (blueOffsideX !== null && ballPosition) {
+        blueOffsideX = Math.max(blueOffsideX, ballPosition.x)
+    }
 
     return (
         <div
@@ -215,7 +245,7 @@ export function Pitch2D({ players, lines, zones = [], isDrawingMode, isEraserMod
                 ))}
 
                 {/* OFFSIDE LINES */}
-                {redOffsideX !== null && (
+                {showOffsideLines && redOffsideX !== null && (
                     <line
                         x1={redOffsideX} y1={0}
                         x2={redOffsideX} y2={100}
@@ -225,7 +255,7 @@ export function Pitch2D({ players, lines, zones = [], isDrawingMode, isEraserMod
                         opacity="0.6"
                     />
                 )}
-                {blueOffsideX !== null && (
+                {showOffsideLines && blueOffsideX !== null && (
                     <line
                         x1={blueOffsideX} y1={0}
                         x2={blueOffsideX} y2={100}
@@ -311,16 +341,37 @@ export function Pitch2D({ players, lines, zones = [], isDrawingMode, isEraserMod
                 )}
             </svg>
 
-            {/* Players Layer */}
+            {/* BALL LAYER */}
+            {ballPosition && (
+                <div
+                    onPointerDown={(e) => handleEntityPointerDown(e, 'ball')}
+                    onPointerMove={(e) => handleEntityPointerMove(e, 'ball')}
+                    onPointerUp={(e) => handleEntityPointerUp(e)}
+                    className={cn(
+                        "absolute w-3 h-3 bg-white rounded-full border border-black transition-shadow select-none z-20 shadow-[0_0_10px_white]",
+                        isDrawingMode ? "pointer-events-none opacity-50" : "cursor-grab pointer-events-auto",
+                        !isDrawingMode && "active:cursor-grabbing",
+                        draggingId === 'ball' && "scale-125 z-50"
+                    )}
+                    style={{
+                        left: `${ballPosition.x}%`,
+                        top: `${ballPosition.y}%`,
+                        transform: 'translate(-50%, -50%)',
+                        touchAction: 'none'
+                    }}
+                />
+            )}
+
+            {/* PLAYERS LAYER */}
             <div className="absolute inset-0 z-10 touch-none">
                 {players.map((p) => {
                     const isDragging = draggingId === p.id
                     return (
                         <div
                             key={p.id}
-                            onPointerDown={(e) => handlePlayerPointerDown(e, p)}
-                            onPointerMove={(e) => handlePlayerPointerMove(e, p)}
-                            onPointerUp={(e) => handlePlayerPointerUp(e, p)}
+                            onPointerDown={(e) => handleEntityPointerDown(e, p.id)}
+                            onPointerMove={(e) => handleEntityPointerMove(e, p.id)}
+                            onPointerUp={(e) => handleEntityPointerUp(e, p)}
                             className={cn(
                                 "absolute w-6 h-6 rounded-full flex items-center justify-center font-bold text-[10px] border-2 transition-shadow select-none",
                                 isDrawingMode ? "pointer-events-none opacity-50" : "cursor-grab pointer-events-auto",
@@ -345,11 +396,11 @@ export function Pitch2D({ players, lines, zones = [], isDrawingMode, isEraserMod
                                     style={{
                                         backgroundColor: (() => {
                                             const tStr = p.tags.join(' ').toLowerCase()
-                                            if (tStr.includes('run') || tStr.includes('sprint') || tStr.includes('attack')) return '#ef4444' // Red
-                                            if (tStr.includes('press') || tStr.includes('mark')) return '#f97316' // Orange
-                                            if (tStr.includes('drop') || tStr.includes('defend') || tStr.includes('cover')) return '#3b82f6' // Blue
-                                            if (tStr.includes('support') || tStr.includes('hold')) return '#eab308' // Yellow
-                                            if (tStr.includes('space') || tStr.includes('zone') || tStr.includes('channel')) return '#a855f7' // Purple
+                                            if (["run", "sprint", "attack", "前插", "跑位", "反击", "佯攻"].some(k => tStr.includes(k))) return '#ef4444' // Red
+                                            if (["press", "mark", "逼抢", "压迫"].some(k => tStr.includes(k))) return '#f97316' // Orange
+                                            if (["drop", "defend", "cover", "回撤", "防守"].some(k => tStr.includes(k))) return '#3b82f6' // Blue
+                                            if (["support", "hold", "支援", "接应"].some(k => tStr.includes(k))) return '#eab308' // Yellow
+                                            if (["space", "zone", "channel", "肋部", "口袋", "14区", "区域", "禁区", "边路"].some(k => tStr.includes(k))) return '#a855f7' // Purple
                                             return '#00ff41' // Default Green
                                         })()
                                     }}

@@ -8,9 +8,9 @@ import { useTranslation } from "react-i18next"
 import "@/utils/i18n"
 
 export const DEFAULT_TAGS = {
-    strategic: ["High Press", "Low Block", "Counter-Attack", "Build-up"],
-    spatial: ["Half-space", "Overload", "Pocket of Space", "Wide Channel"],
-    action: ["Key Pass", "Interception", "Dummy Run", "1v1 Duel"]
+    strategic: ["高位逼抢", "低位防守", "快速反击", "组织进攻"],
+    spatial: ["肋部空间", "局部过载", "接球口袋", "边路通道"],
+    action: ["关键传球", "拦截", "佯攻跑位", "1v1对抗", "前插跑动", "回撤接应", "压迫", "支援"]
 }
 
 interface TagLibraryProps {

@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { RefreshCcw, MousePointer2, PenTool, Eraser, Globe, Minus, MoreHorizontal, ChevronUp, ChevronDown } from "lucide-react"
+import { RefreshCcw, MousePointer2, PenTool, Eraser, Globe, Minus, MoreHorizontal, ChevronUp, ChevronDown, Eye, EyeOff } from "lucide-react"
 import { cn } from "@/utils/cn"
 import { Pitch2D, Player, TacticalLine, DrawingStyle, TacticalZone } from "@/components/tactical/Pitch2D"
 import { TagLibrary } from "@/components/tactical/TagLibrary"
@@ -48,10 +48,12 @@ export default function CommandPage() {
 
     // LOGIC STATE
     const [players, setPlayers] = React.useState<Player[]>(INITIAL_PLAYERS)
+    const [ballPosition, setBallPosition] = React.useState<{ x: number, y: number }>({ x: 50, y: 50 })
     const [lines, setLines] = React.useState<TacticalLine[]>([])
     const [zones, setZones] = React.useState<TacticalZone[]>([])
     // Mode: 'move' | 'draw' | 'eraser'
     const [toolMode, setToolMode] = React.useState<'move' | 'draw' | 'eraser'>('move')
+    const [showOffsideLines, setShowOffsideLines] = React.useState(true)
 
     // TEAM & FORMATION STATE
     const [redTeamName, setRedTeamName] = React.useState("")
@@ -101,6 +103,10 @@ export default function CommandPage() {
 
         // 3. Clear Tactical Zones linked to this player
         setZones(prev => prev.filter(zone => zone.ownerId !== id))
+    }
+
+    const handleBallMove = (x: number, y: number) => {
+        setBallPosition({ x, y })
     }
 
     const handleLineCreate = (line: TacticalLine) => {
@@ -200,7 +206,7 @@ export default function CommandPage() {
         const lowerTag = tag.toLowerCase()
 
         // --- TACTICAL LINES (Movement) ---
-        if (lowerTag.includes("run") || lowerTag.includes("sprint") || lowerTag.includes("attack")) {
+        if (["run", "sprint", "attack", "前插", "跑位", "反击", "佯攻"].some(k => lowerTag.includes(k))) {
             newLine = {
                 id: logicId,
                 points: [{ x: startX, y: startY }, { x: startX + (15 * dir), y: startY }],
@@ -208,7 +214,7 @@ export default function CommandPage() {
                 isDashed: false,
                 ownerId: selectedPlayer.id
             }
-        } else if (lowerTag.includes("press") || lowerTag.includes("close")) {
+        } else if (["press", "close", "逼抢", "压迫"].some(k => lowerTag.includes(k))) {
             newLine = {
                 id: logicId,
                 points: [{ x: startX, y: startY }, { x: startX + (8 * dir), y: startY + (5 * dir) }],
@@ -216,7 +222,7 @@ export default function CommandPage() {
                 isDashed: true,
                 ownerId: selectedPlayer.id
             }
-        } else if (lowerTag.includes("drop") || lowerTag.includes("defend") || lowerTag.includes("recover")) {
+        } else if (["drop", "defend", "recover", "回撤", "防守"].some(k => lowerTag.includes(k))) {
             newLine = {
                 id: logicId,
                 points: [{ x: startX, y: startY }, { x: startX - (10 * dir), y: startY }],
@@ -224,7 +230,7 @@ export default function CommandPage() {
                 isDashed: true,
                 ownerId: selectedPlayer.id
             }
-        } else if (lowerTag.includes("support")) {
+        } else if (["support", "支援", "接应"].some(k => lowerTag.includes(k))) {
             newLine = {
                 id: logicId,
                 points: [{ x: startX, y: startY }, { x: startX + (5 * dir), y: startY + 5 }],
@@ -232,7 +238,7 @@ export default function CommandPage() {
                 isDashed: true,
                 ownerId: selectedPlayer.id
             }
-        } else if (lowerTag.includes("cut")) {
+        } else if (["cut", "内切"].some(k => lowerTag.includes(k))) {
             newLine = {
                 id: logicId,
                 points: [{ x: startX, y: startY }, { x: startX + (10 * dir), y: 60 }],
@@ -242,7 +248,7 @@ export default function CommandPage() {
             }
         }
         // --- TACTICAL ZONES (Spatial) ---
-        else if (lowerTag.includes("half space") || lowerTag.includes("channel")) {
+        else if (["half space", "channel", "肋部"].some(k => lowerTag.includes(k))) {
             // Half Space Zone (Vertical strip)
             newZone = {
                 id: logicId,
@@ -253,7 +259,7 @@ export default function CommandPage() {
                 color: 'rgba(168, 85, 247, 0.3)', // Purple transparent
                 ownerId: selectedPlayer.id
             }
-        } else if (lowerTag.includes("zone 14") || lowerTag.includes("hole")) {
+        } else if (["zone 14", "hole", "口袋", "14区"].some(k => lowerTag.includes(k))) {
             // Central Danger Zone
             newZone = {
                 id: logicId,
@@ -264,7 +270,7 @@ export default function CommandPage() {
                 color: 'rgba(239, 68, 68, 0.3)', // Red transparent
                 ownerId: selectedPlayer.id
             }
-        } else if (lowerTag.includes("box") || lowerTag.includes("area")) {
+        } else if (["box", "area", "禁区"].some(k => lowerTag.includes(k))) {
             // Penalty Area
             newZone = {
                 id: logicId,
@@ -275,7 +281,7 @@ export default function CommandPage() {
                 color: 'rgba(59, 130, 246, 0.3)', // Blue transparent
                 ownerId: selectedPlayer.id
             }
-        } else if (lowerTag.includes("flank") || lowerTag.includes("wide")) {
+        } else if (["flank", "wide", "边路"].some(k => lowerTag.includes(k))) {
             // Wide channel
             newZone = {
                 id: logicId,
@@ -424,6 +430,18 @@ export default function CommandPage() {
                                 ERASE
                             </button>
 
+                            {/* TOGGLE OFFSIDE */}
+                            <button
+                                onClick={() => setShowOffsideLines(!showOffsideLines)}
+                                className={cn(
+                                    "p-1 rounded flex items-center gap-1 text-[10px] transition-all ml-2 border border-[#333]",
+                                    showOffsideLines ? "bg-[#333] text-white" : "text-[#666] hover:text-white"
+                                )}
+                                title="Toggle Offside Lines"
+                            >
+                                {showOffsideLines ? <Eye size={12} /> : <EyeOff size={12} />}
+                            </button>
+
                             {/* DRAWING OPTIONS (Only visible in Draw Mode) */}
                             {toolMode === 'draw' && (
                                 <div className="flex items-center gap-2 ml-2 border-l border-[#333] pl-2 animate-in fade-in slide-in-from-left-2 duration-200">
@@ -475,6 +493,7 @@ export default function CommandPage() {
                                 setPlayers(INITIAL_PLAYERS)
                                 setLines([])
                                 setZones([])
+                                setBallPosition({ x: 50, y: 50 })
                             }}
                             className="ml-auto hover:text-[#00ff41] transition-colors"
                             title={t('command.reset_pitch')}
@@ -491,10 +510,13 @@ export default function CommandPage() {
                                 players={players}
                                 lines={lines}
                                 zones={zones}
+                                ballPosition={ballPosition}
                                 isDrawingMode={toolMode === 'draw'}
                                 isEraserMode={toolMode === 'eraser'}
+                                showOffsideLines={showOffsideLines}
                                 currentStyle={currentStyle}
                                 onPlayerMove={handlePlayerMove}
+                                onBallMove={handleBallMove}
                                 onPlayerSelect={handlePlayerSelect}
                                 onLineCreate={handleLineCreate}
                                 onLineRemove={handleLineRemove}
